@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة ريتز 🌋 | منصة التهاني التفاعلية</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root {
+            --bg-color: #0b0c10;
+            --card-bg: rgba(22, 27, 34, 0.75);
+            --primary: #ff2a5f;
+            --primary-glow: rgba(255, 42, 95, 0.4);
+            --gold: #ffd700;
+            --text-main: #f0f6fc;
+            --text-muted: #8b949e;
+            --border-glow: rgba(255, 215, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(255, 42, 95, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 40%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Controls Section */
+        .control-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .panel-title {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-main);
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .btn-preset:hover, .btn-preset.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .custom-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .custom-input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .custom-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        /* Birthday Card */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glow);
+            border-radius: 24px;
+            padding: 35px 28px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 215, 0, 0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .card:hover {
+            box-shadow: 0 16px 50px rgba(255, 42, 95, 0.25), inset 0 0 20px rgba(255, 215, 0, 0.05);
+        }
+
+        .header-symbol {
+            font-size: 1.1rem;
+            letter-spacing: 2px;
+            color: var(--gold);
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #ff2a5f, #ff758c);
+            color: #fff;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            margin-bottom: 18px;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px var(--primary-glow);
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 20px 0;
+            opacity: 0.5;
+        }
+
+        .message {
+            font-size: 1.1rem;
+            line-height: 1.9;
+            color: #e6edf3;
+            font-weight: 400;
+            margin-bottom: 25px;
+            text-align: justify;
+            text-align-last: center;
+        }
+
+        .recipient-highlight {
+            color: var(--gold);
+            font-weight: 800;
+            font-size: 1.25rem;
+            border-bottom: 2px dashed var(--gold);
+            padding-bottom: 2px;
+        }
+
+        .footer-signature {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .admin-tag {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #fff;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sub-tag {
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        /* Actions Bar */
+        .actions-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-action {
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s ease;
+        }
+
+        .btn-confetti {
+            background: linear-gradient(135deg, #ffd700, #ff8800);
+            color: #000;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-confetti:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.5);
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-copy:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.03);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            background: #238636;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .actions-bar { grid-template-columns: 1fr; }
+            .title { font-size: 1.5rem; }
+            .message { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="panel-title">⚙️ اختيار العضو أو تخصيص التهنئة:</div>
+            <div class="preset-buttons">
+                <button class="btn-preset active" onclick="selectPreset('دوما', '@A9')">دوما (@A9)</button>
+                <button class="btn-preset" onclick="selectPreset('اكازا', '@ETACHY OTSHIHA')">اكازا (@ETACHY)</button>
+            </div>
+            <div class="custom-input-group">
+                <input type="text" id="customName" class="custom-input" placeholder="أدخل اسم الشخص هنا..." oninput="updateCustomName(this.value)">
+            </div>
+        </div>
+
+        <!-- Birthday Display Card -->
+        <div class="card" id="cardContent">
+            <div class="header-symbol">❂ ═─═─═─═ ﷽ ═─═─═─═ ❂</div>
+            <div class="badge">تُهنئ إدارة ريتز 🌋</div>
+            
+            <div class="title">🎂 عــيــد مــيــلاد ســعــيــد 🎉</div>
+            
+            <div class="divider"></div>
+
+            <div class="message">
+                كل عام وأنت بخير، يا <span class="recipient-highlight" id="displayName">دوما @A9</span> 🌹
+                <br><br>
+                نسأل الله أن يجعل عامك الجديد بدايةً لكل خير، وأن يرزقك السعادة، والتوفيق، وراحة البال، وأن تتحقق جميع أمنياتك، وتبقى أيامك مليئة بالفرح والنجاحات. نتمنى لك عمرًا مديدًا في طاعة الله، وسنينًا تزداد فيها تألقًا وتميزًا.
+                <br><br>
+                🎉 كل عام وأنت بألف خير، وعقبال 100 سنة مليئة بالإنجازات واللحظات الجميلة. 🎂🤍
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="footer-signature">
+                <div class="admin-tag">『 👑 إدارة ريتز 🌋 』</div>
+                <div class="sub-tag">￤ 𝑺•𝑨•𝑻￤『🩸』 سبارتا ￤</div>
+            </div>
+        </div>
+
+        <!-- Interactive Action Buttons -->
+        <div class="actions-bar">
+            <button class="btn-action btn-confetti" onclick="triggerConfetti()">🎉 احتفال بالألعاب النارية</button>
+            <button class="btn-action btn-copy" onclick="copyCardText()">📋 نسخ نص التهنئة</button>
+        </div>
+    </div>
+
+    <!-- Toast UI -->
+    <div class="toast" id="toast">تم نسخ التهنئة بنجاح! 📋</div>
+
+    <script>
+        let currentRecipient = "دوما @A9";
+
+        // Launch Confetti on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            triggerConfetti();
+        });
+
+        function selectPreset(name, handle) {
+            document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('customName').value = '';
+            
+            currentRecipient = `${name} ${handle}`;
+            document.getElementById('displayName').innerText = currentRecipient;
+            triggerConfetti();
+        }
+
+        function updateCustomName(val) {
+            if (val.trim() !== '') {
+                document.querySelectorAll('.btn-preset').forEach(btn => btn.classList.remove('active'));
+                currentRecipient = val;
+                document.getElementById('displayName').innerText = currentRecipient;
+            } else {
+                selectPreset('دوما', '@A9');
+            }
+        }
+
+        function triggerConfetti() {
+            // Left burst
+            confetti({
+                particleCount: 60,
+                spread: 70,
+                origin: { y: 0.6, x: 0.3 }
+            });
+            // Right burst
+            confetti({
+                particleCount: 60,
+                spread: 70,
+                origin: { y: 0.6, x: 0.7 }
+            });
+        }
+
+        function copyCardText() {
+            const fullText = `❂ ═─═─═─═﷽═─═─═─═ ❂
+
+￤◞تُهنئ إدارة ريتز 🌋 ⬐◜
+
+▬ 🎂 عــيــد مــيــلاد ســعــيــد 🎉 ▬
+
+⊱───═⪨༻✨༺⪩═───⊰
+
+كل عام وأنت بخير، يا ${currentRecipient}. 🌹
+
+نسأل الله أن يجعل عامك الجديد بدايةً لكل خير، وأن يرزقك السعادة، والتوفيق، وراحة البال، وأن تتحقق جميع أمنياتك، وتبقى أيامك مليئة بالفرح والنجاحات. نتمنى لك عمرًا مديدًا في طاعة الله، وسنينًا تزداد فيها تألقًا وتميزًا.
+
+🎉 كل عام وأنت بألف خير، وعقبال 100 سنة مليئة بالإنجازات واللحظات الجميلة. 🎂🤍
+
+『 👑 إدارة ريتز 🌋 』
+
+⌘￤◞مع أطيب الأمنيات وأصدق التهاني ⬐◜
+
+￤ 𝑺•𝑨•𝑻￤『🩸』 سبارتا ￤
+
+⊱───═⪨༻🎈༺⪩═───⊰`;
+
+            navigator.clipboard.writeText(fullText).then(() => {
+                showToast();
+            });
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
